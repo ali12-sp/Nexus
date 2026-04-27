@@ -4,6 +4,7 @@ type UserLike = {
   id: string;
   fullName: string;
   email: string;
+  emailVerifiedAt: Date | null;
   role: "INVESTOR" | "ENTREPRENEUR";
   bio: string | null;
   profileImage: string | null;
@@ -94,6 +95,18 @@ type NotificationLike = {
   createdAt: Date;
 };
 
+type AuditLogLike = {
+  id: string;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  status: string;
+  ipAddress: string | null;
+  userAgent: string | null;
+  metadata: unknown;
+  createdAt: Date;
+};
+
 const toNumber = (value: Decimalish) =>
   value === null || value === undefined ? null : Number(value);
 
@@ -104,6 +117,7 @@ export const serializeUser = (user: unknown) => {
     id: typedUser.id,
     fullName: typedUser.fullName,
     email: typedUser.email,
+    emailVerifiedAt: typedUser.emailVerifiedAt,
     role: typedUser.role,
     bio: typedUser.bio,
     profileImage: typedUser.profileImage,
@@ -214,6 +228,18 @@ export const serializeNotification = (notification: NotificationLike) => ({
   metadata: notification.metadata,
   readAt: notification.readAt,
   createdAt: notification.createdAt,
+});
+
+export const serializeAuditLog = (entry: AuditLogLike) => ({
+  id: entry.id,
+  action: entry.action,
+  entityType: entry.entityType,
+  entityId: entry.entityId,
+  status: entry.status,
+  ipAddress: entry.ipAddress,
+  userAgent: entry.userAgent,
+  metadata: entry.metadata,
+  createdAt: entry.createdAt,
 });
 
 export const serializeCompactUser = (user: UserLike) => ({

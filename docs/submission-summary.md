@@ -28,6 +28,7 @@
 - Uploads: Multer with local storage fallback and S3-compatible adapter
 - Payments: mock sandbox flow
 - API docs: Swagger
+- Runtime target: Node.js 20.x
 
 ## Deliverables mapping
 
@@ -39,7 +40,8 @@
 
 - Backend build passes
 - Frontend TypeScript verification passes
-- Backend smoke tests passed for health, auth, dashboard, meetings, documents, payments, and OTP
+- Backend smoke tests passed for health, auth, dashboard, meetings, documents, payments, OTP, logout, and runtime metrics
+- Browser-local end-to-end flows were verified for login and dashboard access with seeded accounts
 
 ### Documentation
 
@@ -51,15 +53,16 @@
 
 ## Current readiness
 
-- Implementation readiness: about 85%
-- Submission package readiness: about 75% locally
+- Core implementation readiness: about 95%
+- Submission package readiness: about 90%
+- Deployment readiness: backend is verified locally, frontend is configured for Node 20 deployment on Vercel
 
-## What remains outside this local workspace
+## Remaining launch actions
 
-- Push to GitHub
-- Deploy frontend and backend to live services
-- Run final browser QA on the deployed URLs
+- Deploy backend to Render or Railway with production environment variables
+- Deploy frontend to Vercel with `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_SOCKET_URL`
+- Run the post-deploy browser smoke test on the live URLs
 
 ## Recommended note for supervisor
 
-This submission includes a locally verified, deployment-ready full-stack Nexus implementation. The remaining steps are platform-side rollout actions: pushing to GitHub, configuring cloud environment variables, and validating the same flows on deployed URLs.
+This submission includes a locally verified, deployment-ready full-stack Nexus implementation with documentation, CI, Docker support, and production deployment guidance. The only remaining steps are platform-side rollout actions: configuring cloud environment variables, deploying the frontend and backend, and validating the same flows on the live URLs.

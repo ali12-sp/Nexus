@@ -10,5 +10,8 @@ export const sendSuccess = <T>(
     success: true,
     message,
     data,
+    meta: {
+      requestId: res.req.requestId ?? null,
+    },
   });
 };

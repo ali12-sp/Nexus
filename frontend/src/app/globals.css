@@ -4,6 +4,17 @@
 
 :root {
   color-scheme: light;
+  --font-sans:
+    "Manrope",
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  --font-display:
+    "Space Grotesk",
+    "Avenir Next",
+    "Trebuchet MS",
+    sans-serif;
 }
 
 html {
@@ -17,7 +28,7 @@ body {
     radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 26%),
     radial-gradient(circle at top right, rgba(217, 119, 6, 0.12), transparent 22%),
     linear-gradient(180deg, #f8f3eb 0%, #f4f8fb 48%, #eef7f5 100%);
-  font-family: var(--font-manrope), sans-serif;
+  font-family: var(--font-sans);
 }
 
 a {
@@ -30,7 +41,7 @@ a {
 }
 
 .font-display {
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-display);
 }
 
 * {

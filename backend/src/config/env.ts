@@ -16,7 +16,34 @@ const envSchema = z.object({
   CLIENT_URL: z.string().url().default("http://localhost:3000"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   JWT_SECRET: z.string().min(16, "JWT_SECRET must be at least 16 characters"),
-  JWT_EXPIRES_IN: z.string().default("7d"),
+  JWT_EXPIRES_IN: z.string().default("15m"),
+  JWT_REFRESH_SECRET: z
+    .string()
+    .min(16, "JWT_REFRESH_SECRET must be at least 16 characters"),
+  JWT_REFRESH_EXPIRES_IN: z.string().default("30d"),
+  REFRESH_TOKEN_COOKIE_NAME: z.string().default("nexus_rt"),
+  COOKIE_DOMAIN: z.string().optional(),
+  COOKIE_SECURE: z
+    .preprocess((value) => {
+      if (typeof value === "boolean") {
+        return value;
+      }
+
+      if (typeof value === "string") {
+        if (value.toLowerCase() === "true") {
+          return true;
+        }
+
+        if (value.toLowerCase() === "false") {
+          return false;
+        }
+      }
+
+      return value;
+    }, z.boolean())
+    .default(false),
+  PASSWORD_RESET_TOKEN_EXPIRES_MINUTES: z.coerce.number().default(30),
+  EMAIL_VERIFICATION_TOKEN_EXPIRES_HOURS: z.coerce.number().default(24),
   UPLOAD_DIR: z.string().default("uploads"),
   MAX_FILE_SIZE_MB: z.coerce.number().default(10),
   AWS_S3_BUCKET: z.string().optional(),

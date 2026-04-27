@@ -24,6 +24,7 @@ export interface User {
   id: string;
   fullName: string;
   email: string;
+  emailVerifiedAt?: string | null;
   role: UserRole;
   bio?: string | null;
   profileImage?: string | null;
@@ -119,6 +120,18 @@ export interface NotificationItem {
   createdAt: string;
 }
 
+export interface AuditLogItem {
+  id: string;
+  action: string;
+  entityType: string;
+  entityId?: string | null;
+  status: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  metadata?: Record<string, unknown> | null;
+  createdAt: string;
+}
+
 export interface DashboardSummary {
   profile: User;
   stats: {
@@ -137,10 +150,17 @@ export interface DashboardSummary {
 export interface AuthResponse {
   token: string;
   user: User;
+  session?: {
+    accessTokenExpiresAt: string;
+    refreshTokenExpiresAt: string;
+  };
 }
 
 export interface ApiEnvelope<T> {
   success: boolean;
   message: string;
   data: T;
+  meta?: {
+    requestId?: string;
+  };
 }

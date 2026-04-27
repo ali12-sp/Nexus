@@ -11,8 +11,6 @@ import {
 import { apiFetch } from "@/lib/api";
 import type { AuthResponse, User, UserRole } from "@/lib/types";
 
-const STORAGE_KEY = "nexus.auth.token";
-
 type AuthContextValue = {
   user: User | null;
   token: string | null;
@@ -24,61 +22,45 @@ type AuthContextValue = {
     password: string;
     role: UserRole;
   }) => Promise<User>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   setUser: (user: User | null) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const persistToken = (token: string | null) => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  if (token) {
-    window.localStorage.setItem(STORAGE_KEY, token);
-    return;
-  }
-
-  window.localStorage.removeItem(STORAGE_KEY);
-};
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [accessTokenExpiresAt, setAccessTokenExpiresAt] = useState<string | null>(null);
 
-  const hydrateSession = async (nextToken: string) => {
-    const me = await apiFetch<User>("/users/me", {
-      token: nextToken,
+  const clearSession = () => {
+    setToken(null);
+    setUser(null);
+    setAccessTokenExpiresAt(null);
+  };
+
+  const commitSession = (result: AuthResponse) => {
+    setToken(result.token);
+    setUser(result.user);
+    setAccessTokenExpiresAt(result.session?.accessTokenExpiresAt ?? null);
+  };
+
+  const refreshSession = async () => {
+    const result = await apiFetch<AuthResponse>("/auth/refresh", {
+      method: "POST",
     });
 
-    setToken(nextToken);
-    setUser(me);
-    persistToken(nextToken);
+    commitSession(result);
   };
 
   useEffect(() => {
     const restoreSession = async () => {
-      if (typeof window === "undefined") {
-        setIsLoading(false);
-        return;
-      }
-
-      const storedToken = window.localStorage.getItem(STORAGE_KEY);
-
-      if (!storedToken) {
-        setIsLoading(false);
-        return;
-      }
-
       try {
-        await hydrateSession(storedToken);
+        await refreshSession();
       } catch {
-        persistToken(null);
-        setToken(null);
-        setUser(null);
+        clearSession();
       } finally {
         setIsLoading(false);
       }
@@ -87,13 +69,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     void restoreSession();
   }, []);
 
+  useEffect(() => {
+    if (!accessTokenExpiresAt || typeof window === "undefined") {
+      return;
+    }
+
+    const refreshDelay = new Date(accessTokenExpiresAt).getTime() - Date.now() - 60_000;
+
+    if (refreshDelay <= 0) {
+      void refreshSession().catch(() => {
+        clearSession();
+      });
+      return;
+    }
+
+    const timerId = window.setTimeout(() => {
+      void refreshSession().catch(() => {
+        clearSession();
+      });
+    }, refreshDelay);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [accessTokenExpiresAt]);
+
   const login = async (input: { email: string; password: string }) => {
     const result = await apiFetch<AuthResponse>("/auth/login", {
       method: "POST",
       body: input,
     });
 
-    await hydrateSession(result.token);
+    commitSession(result);
     return result.user;
   };
 
@@ -108,22 +115,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       body: input,
     });
 
-    await hydrateSession(result.token);
+    commitSession(result);
     return result.user;
   };
 
-  const logout = () => {
-    persistToken(null);
-    setToken(null);
-    setUser(null);
-  };
-
-  const refreshSession = async () => {
-    if (!token) {
-      return;
+  const logout = async () => {
+    try {
+      await apiFetch<{ loggedOut: boolean }>("/auth/logout", {
+        method: "POST",
+        token,
+      });
+    } catch {
+      // Always clear client state, even if the network request fails.
     }
 
-    await hydrateSession(token);
+    clearSession();
   };
 
   return (

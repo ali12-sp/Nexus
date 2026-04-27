@@ -18,6 +18,7 @@ const main = async () => {
       where: { email: "sarah.investor@nexus.local" },
       update: {
         fullName: "Sarah Mitchell",
+        emailVerifiedAt: new Date(),
         passwordHash,
         walletBalance: 120000,
       },
@@ -25,6 +26,7 @@ const main = async () => {
         id: "seed_investor_sarah",
         fullName: "Sarah Mitchell",
         email: "sarah.investor@nexus.local",
+        emailVerifiedAt: new Date(),
         passwordHash,
         role: "INVESTOR",
         bio: "Angel investor focused on B2B SaaS, AI, and workflow infrastructure.",
@@ -47,6 +49,7 @@ const main = async () => {
       where: { email: "omar.investor@nexus.local" },
       update: {
         fullName: "Omar Rahman",
+        emailVerifiedAt: new Date(),
         passwordHash,
         walletBalance: 80000,
       },
@@ -54,6 +57,7 @@ const main = async () => {
         id: "seed_investor_omar",
         fullName: "Omar Rahman",
         email: "omar.investor@nexus.local",
+        emailVerifiedAt: new Date(),
         passwordHash,
         role: "INVESTOR",
         bio: "Operator-turned-investor supporting enterprise and climate founders.",
@@ -75,6 +79,7 @@ const main = async () => {
       where: { email: "ali.founder@nexus.local" },
       update: {
         fullName: "Ali Raza",
+        emailVerifiedAt: new Date(),
         passwordHash,
         walletBalance: 18000,
       },
@@ -82,6 +87,7 @@ const main = async () => {
         id: "seed_founder_ali",
         fullName: "Ali Raza",
         email: "ali.founder@nexus.local",
+        emailVerifiedAt: new Date(),
         passwordHash,
         role: "ENTREPRENEUR",
         bio: "Building a secure collaboration stack for investor-founder workflows.",
@@ -106,6 +112,7 @@ const main = async () => {
       where: { email: "maya.founder@nexus.local" },
       update: {
         fullName: "Maya Chen",
+        emailVerifiedAt: new Date(),
         passwordHash,
         walletBalance: 12500,
       },
@@ -113,6 +120,7 @@ const main = async () => {
         id: "seed_founder_maya",
         fullName: "Maya Chen",
         email: "maya.founder@nexus.local",
+        emailVerifiedAt: new Date(),
         passwordHash,
         role: "ENTREPRENEUR",
         bio: "Founder of a fintech operations platform for distributed teams.",

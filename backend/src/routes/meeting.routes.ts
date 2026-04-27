@@ -9,6 +9,7 @@ import {
 } from "../controllers/meeting.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   cancelMeetingSchema,
   createMeetingSchema,
@@ -19,8 +20,16 @@ import {
 export const meetingRouter = Router();
 
 meetingRouter.use(requireAuth);
-meetingRouter.post("/", validate(createMeetingSchema), createMeetingController);
-meetingRouter.get("/", listMeetingsController);
-meetingRouter.get("/:id", validate(meetingIdParamSchema), getMeetingController);
-meetingRouter.patch("/:id/respond", validate(respondMeetingSchema), respondMeetingController);
-meetingRouter.patch("/:id/cancel", validate(cancelMeetingSchema), cancelMeetingController);
+meetingRouter.post("/", validate(createMeetingSchema), asyncHandler(createMeetingController));
+meetingRouter.get("/", asyncHandler(listMeetingsController));
+meetingRouter.get("/:id", validate(meetingIdParamSchema), asyncHandler(getMeetingController));
+meetingRouter.patch(
+  "/:id/respond",
+  validate(respondMeetingSchema),
+  asyncHandler(respondMeetingController),
+);
+meetingRouter.patch(
+  "/:id/cancel",
+  validate(cancelMeetingSchema),
+  asyncHandler(cancelMeetingController),
+);

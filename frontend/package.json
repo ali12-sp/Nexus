@@ -2,11 +2,15 @@
   "name": "frontend",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node scripts/run-next.mjs dev",
+    "build": "node scripts/run-next.mjs build",
+    "start": "node scripts/run-next.mjs start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --check \"src/**/*.{ts,tsx,css}\""
   },
   "dependencies": {

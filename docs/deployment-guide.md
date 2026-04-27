@@ -5,6 +5,7 @@
 - Frontend: Vercel
 - Backend: Render
 - Database: Render PostgreSQL or any managed PostgreSQL provider
+- Node.js runtime: 20.x
 - File storage:
   - local persistent disk for MVP deployment on Render
   - S3-compatible storage when cloud object storage is available
@@ -52,7 +53,11 @@ Required:
 - `CLIENT_URL=https://your-frontend-domain.vercel.app`
 - `DATABASE_URL=<render-or-managed-postgres-connection-string>`
 - `JWT_SECRET=<strong-random-secret>`
-- `JWT_EXPIRES_IN=7d`
+- `JWT_EXPIRES_IN=15m`
+- `JWT_REFRESH_SECRET=<second-strong-random-secret>`
+- `JWT_REFRESH_EXPIRES_IN=30d`
+- `REFRESH_TOKEN_COOKIE_NAME=nexus_rt`
+- `COOKIE_SECURE=true`
 - `UPLOAD_DIR=/opt/render/project/src/backend/uploads`
 - `MAX_FILE_SIZE_MB=10`
 - `PAYMENT_PROVIDER=MOCK`
@@ -71,17 +76,20 @@ Optional:
 - `SMTP_PORT`
 - `SMTP_USER`
 - `SMTP_PASS`
+- `COOKIE_DOMAIN`
 
 ## 2. Frontend deployment on Vercel
 
 - Import the same repository into Vercel.
 - Set the project `Root Directory` to `frontend`.
 - Keep the framework preset as `Next.js`.
+- Let Vercel build the frontend with `Node 20.x`; that is the deployment source of truth even if a local Windows `Node 24.x` build is noisy or slow.
 
 ### Frontend environment variables
 
 - `NEXT_PUBLIC_API_BASE_URL=https://your-backend-domain.onrender.com/api`
 - `NEXT_PUBLIC_SOCKET_URL=https://your-backend-domain.onrender.com`
+- `NEXT_IGNORE_INCORRECT_LOCKFILE=1`
 
 ### Recommended build settings
 
@@ -102,6 +110,12 @@ npm run build
 ```text
 .next
 ```
+
+### Frontend build note
+
+- The frontend workspace wraps `next dev`, `next build`, and `next start` through `frontend/scripts/run-next.mjs`.
+- That wrapper sets `NEXT_IGNORE_INCORRECT_LOCKFILE=1` before Next boots, which prevents the SWC lockfile patch attempt that can appear on machines with npm workspaces plus pnpm installed.
+- If a local Windows build still stalls, use Vercel or the provided Docker stack for the production build verification.
 
 ## 3. Database setup
 
@@ -127,6 +141,7 @@ npm run prisma:seed
 Backend:
 
 - Open `/api/health`
+- Open `/api/ready`
 - Open `/api/docs`
 - Log in with a seeded account
 - Verify `/api/dashboard`, `/api/meetings`, `/api/documents`, `/api/payments/transactions`
@@ -148,4 +163,11 @@ Realtime and uploads:
 - Current payments are sandbox or mock only by design.
 - OTP is realistic for MVP, but email delivery depends on SMTP configuration.
 - Local disk uploads are acceptable for MVP, but S3-compatible storage is recommended for long-term production use.
-- The frontend workspace still has occasional Next.js lockfile patch warnings during production builds; the app code is healthy, but workspace dependency cleanup is still recommended.
+- The repo is pinned to Node 20.x for deployment parity and Prisma reliability.
+- Access tokens are intentionally short-lived; the frontend restores sessions through an HTTP-only refresh cookie.
+
+## 6. Containerized smoke environment
+
+- Use the root `docker-compose.yml` to run PostgreSQL, backend, and frontend together.
+- Backend container starts with Prisma migrations before serving traffic.
+- Frontend container is built with the same Node 20 runtime and lockfile bypass used in CI.

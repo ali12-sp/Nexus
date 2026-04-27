@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { ZodError } from "zod";
 
 import { AppError } from "../utils/appError.js";
+import { logError } from "../utils/logger.js";
 
 const isPrismaKnownRequestError = (
   error: Error,
@@ -14,7 +15,7 @@ const isPrismaKnownRequestError = (
 
 export const errorHandler = (
   error: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ) => {
@@ -23,6 +24,9 @@ export const errorHandler = (
       success: false,
       message: error.message,
       errors: error.details ?? null,
+      meta: {
+        requestId: req.requestId,
+      },
     });
   }
 
@@ -31,6 +35,9 @@ export const errorHandler = (
       success: false,
       message: "Validation failed",
       errors: error.flatten(),
+      meta: {
+        requestId: req.requestId,
+      },
     });
   }
 
@@ -39,8 +46,19 @@ export const errorHandler = (
       success: false,
       message: "Database request failed",
       errors: error.meta ?? error.message,
+      meta: {
+        requestId: req.requestId,
+      },
     });
   }
+
+  logError("Unhandled request error", {
+    requestId: req.requestId,
+    method: req.method,
+    path: req.originalUrl,
+    errorName: error.name,
+    errorMessage: error.message,
+  });
 
   return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
     success: false,
@@ -52,5 +70,8 @@ export const errorHandler = (
             message: error.message,
           }
         : null,
+    meta: {
+      requestId: req.requestId,
+    },
   });
 };

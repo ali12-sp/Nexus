@@ -60,7 +60,7 @@ export const RegisterForm = () => {
     <AuthScreen
       eyebrow="Account Setup"
       title="Create your Nexus account"
-      description="Choose your role now. You’ll land in a dashboard tailored to your investor or founder workflow."
+      description="Choose your role now. You'll land in a dashboard tailored to your investor or founder workflow."
     >
       <form className="grid gap-5 sm:grid-cols-2" onSubmit={handleSubmit}>
         <div className="sm:col-span-2">
@@ -105,7 +105,11 @@ export const RegisterForm = () => {
           />
         </div>
 
-        {error ? <p className="sm:col-span-2 rounded-2xl bg-red-50 px-4 py-3 text-sm text-ember">{error}</p> : null}
+        {error ? (
+          <p className="sm:col-span-2 rounded-2xl bg-red-50 px-4 py-3 text-sm text-ember">
+            {error}
+          </p>
+        ) : null}
 
         <div className="sm:col-span-2">
           <Button disabled={isSubmitting} fullWidth size="lg" type="submit">

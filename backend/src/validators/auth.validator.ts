@@ -38,3 +38,36 @@ export const verifyOtpSchema = z.object({
   query: z.object({}).optional(),
   params: z.object({}).optional(),
 });
+
+export const requestPasswordResetSchema = z.object({
+  body: z.object({
+    email: z.string().email(),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});
+
+export const resetPasswordSchema = z.object({
+  body: z.object({
+    token: z.string().min(32).max(255),
+    password: z.string().min(8).max(64),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});
+
+export const verifyEmailSchema = z.object({
+  body: z.object({
+    token: z.string().min(32).max(255),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});
+
+export const auditLogListSchema = z.object({
+  body: z.object({}).optional(),
+  query: z.object({
+    limit: z.coerce.number().int().min(1).max(50).optional(),
+  }),
+  params: z.object({}).optional(),
+});

@@ -90,6 +90,12 @@ export const LoginForm = () => {
           Create an account
         </Link>
       </p>
+      <p className="text-sm text-slate">
+        Need help accessing your workspace?{" "}
+        <Link className="font-semibold text-mint hover:underline" href="/reset-password">
+          Reset your password
+        </Link>
+      </p>
     </AuthScreen>
   );
 };

@@ -31,6 +31,13 @@ export const openApiDocument = {
             properties: {
               token: { type: "string" },
               user: { $ref: "#/components/schemas/User" },
+              session: {
+                type: "object",
+                properties: {
+                  accessTokenExpiresAt: { type: "string", format: "date-time" },
+                  refreshTokenExpiresAt: { type: "string", format: "date-time" },
+                },
+              },
             },
           },
         },
@@ -41,6 +48,7 @@ export const openApiDocument = {
           id: { type: "string" },
           fullName: { type: "string" },
           email: { type: "string" },
+          emailVerifiedAt: { type: "string", format: "date-time", nullable: true },
           role: { type: "string", enum: ["INVESTOR", "ENTREPRENEUR"] },
           bio: { type: "string", nullable: true },
           profileImage: { type: "string", nullable: true },
@@ -104,6 +112,19 @@ export const openApiDocument = {
           reference: { type: "string" },
         },
       },
+      AuditLog: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          action: { type: "string" },
+          entityType: { type: "string" },
+          entityId: { type: "string", nullable: true },
+          status: { type: "string" },
+          ipAddress: { type: "string", nullable: true },
+          userAgent: { type: "string", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -122,6 +143,47 @@ export const openApiDocument = {
         summary: "Login and receive a JWT",
       },
     },
+    "/api/auth/refresh": {
+      post: {
+        tags: ["Auth"],
+        security: [],
+        summary: "Refresh the access token using an HTTP-only refresh cookie",
+      },
+    },
+    "/api/auth/logout": {
+      post: {
+        tags: ["Auth"],
+        security: [],
+        summary: "Clear the refresh cookie and end the browser session",
+      },
+    },
+    "/api/auth/request-password-reset": {
+      post: {
+        tags: ["Auth"],
+        security: [],
+        summary: "Issue a password reset workflow and send a secure link",
+      },
+    },
+    "/api/auth/reset-password": {
+      post: {
+        tags: ["Auth"],
+        security: [],
+        summary: "Reset the account password with a valid recovery token",
+      },
+    },
+    "/api/auth/request-email-verification": {
+      post: {
+        tags: ["Auth"],
+        summary: "Issue a fresh email verification link for the signed-in user",
+      },
+    },
+    "/api/auth/verify-email": {
+      post: {
+        tags: ["Auth"],
+        security: [],
+        summary: "Verify a user email with a single-use token",
+      },
+    },
     "/api/auth/send-otp": {
       post: {
         tags: ["Auth"],
@@ -134,6 +196,12 @@ export const openApiDocument = {
         tags: ["Auth"],
         security: [],
         summary: "Verify a previously sent OTP",
+      },
+    },
+    "/api/auth/audit-logs": {
+      get: {
+        tags: ["Auth"],
+        summary: "List recent audit activity for the signed-in user",
       },
     },
     "/api/users/me": {
@@ -156,6 +224,20 @@ export const openApiDocument = {
       get: {
         tags: ["Dashboard"],
         summary: "Get role-aware dashboard summary data",
+      },
+    },
+    "/api/ready": {
+      get: {
+        tags: ["System"],
+        security: [],
+        summary: "Verify API readiness and database connectivity",
+      },
+    },
+    "/api/metrics/runtime": {
+      get: {
+        tags: ["System"],
+        security: [],
+        summary: "Fetch lightweight runtime metrics for operational checks",
       },
     },
     "/api/meetings": {

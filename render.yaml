@@ -5,7 +5,7 @@ services:
     rootDir: backend
     buildCommand: npm install && npm run build
     startCommand: npm run prisma:migrate && npm start
-    healthCheckPath: /api/health
+    healthCheckPath: /api/ready
     envVars:
       - key: NODE_VERSION
         value: 20.19.0
@@ -20,7 +20,15 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
-        value: 7d
+        value: 15m
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 30d
+      - key: REFRESH_TOKEN_COOKIE_NAME
+        value: nexus_rt
+      - key: COOKIE_SECURE
+        value: true
       - key: PAYMENT_PROVIDER
         value: MOCK
       - key: UPLOAD_DIR

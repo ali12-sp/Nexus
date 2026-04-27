@@ -27,6 +27,7 @@ type ApiRequestOptions = {
   headers?: HeadersInit;
   formData?: FormData;
   cache?: RequestCache;
+  credentials?: RequestCredentials;
 };
 
 export const buildApiUrl = (path: string) =>
@@ -39,11 +40,20 @@ export const resolveAssetUrl = (value: string) =>
 
 export const apiFetch = async <T>(
   path: string,
-  { method = "GET", token, body, headers, formData, cache }: ApiRequestOptions = {},
+  {
+    method = "GET",
+    token,
+    body,
+    headers,
+    formData,
+    cache,
+    credentials = "include",
+  }: ApiRequestOptions = {},
 ) => {
   const response = await fetch(buildApiUrl(path), {
     method,
     cache: cache ?? "no-store",
+    credentials,
     headers: {
       ...(formData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -58,7 +68,9 @@ export const apiFetch = async <T>(
     throw new ApiError(
       payload?.message ?? "Request failed",
       response.status,
-      payload && "errors" in payload ? (payload as ApiEnvelope<T> & { errors?: unknown }).errors : null,
+      payload && "errors" in payload
+        ? (payload as ApiEnvelope<T> & { errors?: unknown }).errors
+        : null,
     );
   }
 

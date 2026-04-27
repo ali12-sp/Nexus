@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 
 import { env } from "../config/env.js";
+import { logInfo } from "../utils/logger.js";
 
 const canSendMail = Boolean(env.SMTP_HOST && env.SMTP_PORT && env.SMTP_USER && env.SMTP_PASS);
 
@@ -26,7 +27,10 @@ export const sendMail = async ({
   html: string;
 }) => {
   if (!transporter) {
-    console.log(`[mail-fallback] ${subject} -> ${to}`);
+    logInfo("Mail fallback used", {
+      subject,
+      to,
+    });
     console.log(html);
     return;
   }

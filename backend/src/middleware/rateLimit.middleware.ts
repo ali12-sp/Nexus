@@ -5,8 +5,13 @@ export const authRateLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Too many authentication attempts, please try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many authentication attempts, please try again later.",
+      meta: {
+        requestId: req.requestId,
+      },
+    });
   },
 });

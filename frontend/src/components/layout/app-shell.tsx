@@ -116,8 +116,9 @@ export const AppShell = ({ title, description, children, actions }: AppShellProp
               fullWidth
               variant="ghost"
               onClick={() => {
-                logout();
-                router.replace("/login");
+                void logout().finally(() => {
+                  router.replace("/login");
+                });
               }}
             >
               <LogOut className="mr-2" size={16} />
