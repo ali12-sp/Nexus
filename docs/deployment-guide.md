@@ -4,7 +4,7 @@
 
 - Frontend: Vercel
 - Backend: Render
-- Database: Render PostgreSQL or any managed PostgreSQL provider
+- Database: Neon or any managed PostgreSQL provider
 - Node.js runtime: 20.x
 - File storage:
   - local persistent disk for MVP deployment on Render
@@ -17,19 +17,20 @@
 - Connect the GitHub repository to Render.
 - Choose `Blueprint` deployment.
 - Use the root-level `render.yaml`.
-- After the database is created, set `CLIENT_URL` to the deployed frontend URL.
+- Set `DATABASE_URL` to the Neon connection string.
+- Set `CLIENT_URL` to the deployed frontend URL.
 - If email delivery is needed, add SMTP credentials.
 - If cloud storage is needed, add the AWS-compatible variables from `backend/.env.example`.
 
 ### Option B: Manual Web Service
 
-- Create a new `PostgreSQL` database in Render.
+- Create or choose a Neon PostgreSQL database.
 - Create a new `Web Service` pointing to the same repo.
 - Set the service `Root Directory` to `backend`.
 - Build command:
 
 ```bash
-npm install && npm run build
+npm install --include=dev && npm run build
 ```
 
 - Start command:
@@ -51,7 +52,7 @@ Required:
 - `NODE_ENV=production`
 - `PORT=4000`
 - `CLIENT_URL=https://your-frontend-domain.vercel.app`
-- `DATABASE_URL=<render-or-managed-postgres-connection-string>`
+- `DATABASE_URL=<neon-or-managed-postgres-connection-string>`
 - `JWT_SECRET=<strong-random-secret>`
 - `JWT_EXPIRES_IN=15m`
 - `JWT_REFRESH_SECRET=<second-strong-random-secret>`
